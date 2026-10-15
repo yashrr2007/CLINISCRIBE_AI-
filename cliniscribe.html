@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CliniScribe AI</title>
+<style>
+:root{color-scheme:light;--bg:#f4f7fb;--card:#fff;--ink:#0f1b33;--mut:#5b6b85;--line:#e3e9f2;--soft:#eaf1ff;--field:#fff;
+--blue:#2563eb;--teal:#0d9488;--vio:#7c3aed;--red:#dc2626;--amb:#d97706;--grn:#059669;
+--wbg:#fffbeb;--wbd:#fde68a;--wfg:#92400e;--ebg:#fef2f2;--ebd:#fecaca;--efg:#991b1b;--gbg:#ecfdf5;--gbd:#a7f3d0;--gfg:#065f46}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0b1220;--card:#121b2e;--ink:#e6edf8;--mut:#93a3bd;--line:#223049;--soft:#16264a;--field:#0f1829;
+--blue:#5b8cff;--teal:#2dd4bf;--vio:#a78bfa;--red:#f87171;--amb:#fbbf24;--grn:#34d399;
+--wbg:#2a2110;--wbd:#6b5214;--wfg:#fcd34d;--ebg:#2b1416;--ebd:#6b2127;--efg:#fca5a5;--gbg:#0f2a22;--gbd:#17563f;--gfg:#6ee7b7}}
+*{box-sizing:border-box}html,body{margin:0}
+body{font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.app{display:flex;min-height:100vh}
+aside{width:232px;background:var(--card);border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;transition:width .2s;z-index:30;overflow:hidden}
+.col aside{width:68px}.col .lbl{display:none}
+.logo{display:flex;gap:10px;align-items:center;padding:4px 6px 16px;font-weight:700;font-size:16px;white-space:nowrap}
+.logo .m{background:var(--blue);color:#fff;border-radius:9px;padding:7px;display:grid;place-items:center}
+.nav{border:0;background:none;width:100%;display:flex;gap:10px;align-items:center;padding:10px;border-radius:8px;color:var(--mut);cursor:pointer;text-align:left;position:relative;white-space:nowrap;margin-bottom:2px}
+.nav:hover{background:var(--bg);color:var(--ink)}.nav.on{background:var(--soft);color:var(--blue);font-weight:600}
+.nav .cnt{margin-left:auto;background:var(--blue);color:#fff;border-radius:99px;font-size:11px;padding:0 7px;min-width:20px;text-align:center}
+.side-foot{margin-top:auto;font-size:12px;color:var(--mut);padding:10px 6px;border-top:1px solid var(--line)}
+main{flex:1;min-width:0}
+header{display:flex;gap:12px;align-items:center;padding:12px 24px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.ib{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px;cursor:pointer;display:grid;place-items:center}
+.ib:hover{background:var(--bg)}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 14px;font-weight:500;cursor:pointer;display:inline-flex;gap:6px;align-items:center;transition:transform .1s,background .15s}
+.btn:hover{background:var(--bg)}.btn:active{transform:scale(.98)}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}.btn.p:hover{filter:brightness(.92)}
+.btn.g{background:var(--grn);border-color:var(--grn);color:#04251b}.btn:disabled{opacity:.45;cursor:not-allowed}
+.pg{padding:24px;max-width:1160px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:15px;margin:0}h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);margin:18px 0 8px}
+.sub{color:var(--mut)}.crumb{color:var(--mut);font-size:12px}.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:0 1px 2px rgba(15,27,51,.04)}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:2fr 1fr}.g2e{grid-template-columns:1fr 1fr}.g12{grid-template-columns:1fr 1.4fr}.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.between{justify-content:space-between}
+.hero{background:linear-gradient(90deg,var(--card),var(--soft));border-left:4px solid var(--blue);margin-bottom:16px}
+.stat b{font-size:24px;display:block;margin-top:4px}
+.stepper{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px}
+.stp{flex:1;min-width:108px;padding:8px 10px;border-radius:8px;background:var(--card);border:1px solid var(--line);font-size:12px;color:var(--mut);display:flex;gap:6px;align-items:center;white-space:nowrap}
+.stp.on{border-color:var(--blue);color:var(--blue);background:var(--soft);font-weight:600}.stp.done{color:var(--grn)}
+.stp .n{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;display:grid;place-items:center;font-size:10px;font-weight:700;flex:none}
+.drop{border:2px dashed #9db4dd;border-radius:14px;padding:44px 16px;text-align:center;background:var(--soft);cursor:pointer;transition:.15s}
+.drop.over,.drop:hover{border-color:var(--blue);filter:brightness(1.03)}
+.drop svg.i{width:38px;height:38px;color:var(--blue)}
+textarea,select,input[type=text]{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--field)}
+textarea{resize:vertical}select{width:auto;padding:8px}
+.ring{--v:0;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--v)*1%),var(--line) 0)}
+.ring div{width:74px;height:74px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:700;font-size:18px}
+.thumb{width:100%;border-radius:8px;border:1px solid var(--line);cursor:zoom-in;display:block}
+.fact{border:1px solid var(--line);border-left:4px solid var(--gc,var(--mut));border-radius:10px;padding:12px;background:var(--card)}
+.fact .t{font-weight:600}.fact .src{font-size:12px;color:var(--mut);margin-top:6px;padding-left:8px;border-left:2px solid var(--line);font-style:italic}
+.k-medications{--gc:var(--blue)}.k-symptoms_and_findings{--gc:var(--teal)}.k-negations{--gc:var(--red)}.k-patient_details{--gc:var(--vio)}.k-other_measurements{--gc:var(--amb)}
+.chip{display:inline-block;font-size:11px;padding:2px 9px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--mut);font-weight:600;margin:4px 6px 0 0}
+.chip.neg{background:var(--ebg);border-color:var(--ebd);color:var(--efg)}.chip.act{background:var(--soft);border-color:transparent;color:var(--blue)}
+.pill{font-size:12px;padding:3px 10px;border-radius:99px;font-weight:600;background:var(--bg);color:var(--mut);border:1px solid var(--line)}
+.pill.ok{background:var(--gbg);color:var(--gfg);border-color:var(--gbd)}.pill.bad{background:var(--ebg);color:var(--efg);border-color:var(--ebd)}
+.note{font-size:12px;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-bottom:16px;display:flex;gap:8px;align-items:center}
+.err{background:var(--ebg);border:1px solid var(--ebd);color:var(--efg);border-radius:8px;padding:10px 12px;margin:10px 0}
+.warn{background:var(--wbg);border:1px solid var(--wbd);color:var(--wfg);border-radius:8px;padding:10px 12px;margin:8px 0;display:flex;gap:8px}
+.okb{background:var(--gbg);border:1px solid var(--gbd);color:var(--gfg);border-radius:8px;padding:10px 12px;margin:8px 0}
+.priv{background:var(--gbg);border:1px solid var(--gbd);color:var(--gfg);border-radius:8px;padding:10px 12px;margin:0 0 12px;display:flex;gap:8px;align-items:flex-start}
+.priv.off{background:var(--ebg);border-color:var(--ebd);color:var(--efg)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.tab{border:0;background:none;padding:8px 12px;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent;font-weight:500}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.spin{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+table{width:100%;border-collapse:collapse}th{font-size:12px;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-weight:500}
+td{padding:10px;border-bottom:1px solid var(--line)}.tw{overflow-x:auto}
+dialog{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:22px;max-width:min(720px,92vw);width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(8,14,28,.55)}
+#toast{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:90}
+#toast div{background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#printOnly{display:none}.mb{display:none}
+@media(max-width:860px){aside{position:fixed;left:-250px;height:100%;transition:left .2s;width:232px!important}.open aside{left:0}.col .lbl{display:inline}.mb{display:grid}.dsk{display:none}
+ .g2,.g2e,.g12{grid-template-columns:1fr}header{padding:10px 12px}.pg{padding:14px}}
+@media print{.app,#toast,dialog{display:none!important}#printOnly{display:block;white-space:pre-wrap;font:12pt/1.4 Georgia,serif;color:#000}body{background:#fff}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:2s!important}}
+</style></head>
+<body>
+<div class="app" id="app">
+<aside aria-label="Main navigation">
+ <div class="logo"><span class="m" id="logoIc"></span><span class="lbl">CliniScribe AI</span></div>
+ <nav id="nav"></nav>
+ <div class="side-foot lbl">Nothing is saved to disk or a database. Closing this page clears everything.</div>
+</aside>
+<main>
+ <header>
+  <button class="ib mb" id="menu" aria-label="Open menu"></button>
+  <button class="ib dsk" id="coll" aria-label="Collapse sidebar"></button>
+  <div><div class="crumb" id="crumb"></div><b id="ttl"></b></div>
+  <span id="hpill" class="pill" style="margin-left:auto">Checking server...</span>
+  <button class="btn p" id="newBtn"></button>
+ </header>
+ <div class="pg" id="view"></div>
+</main></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<dialog id="dlg"></dialog>
+<div id="printOnly"></div>
+
+<script>
+/* ===== helpers ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const P={check:'M20 6 9 17l-5-5',plus:'M12 5v14M5 12h14',upload:'M12 3v12M7 8l5-5 5 5M5 21h14',
+ file:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6',shield:'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
+ home:'M3 11l9-8 9 8M5 10v10h14V10',gear:'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2',
+ copy:'M9 9h11v11H9zM5 15V4h11',download:'M12 3v12M7 10l5 5 5-5M5 21h14',menu:'M4 6h16M4 12h16M4 18h16',panel:'M3 4h18v16H3zM9 4v16',
+ warn:'M12 3 2 21h20zM12 10v5M12 18v.01',history:'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2',print:'M6 9V3h12v6M6 18H4v-7h16v7h-2M6 14h12v7H6z',
+ x:'M18 6 6 18M6 6l12 12',refresh:'M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5',info:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8v.01'};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="${P[n]}"/></svg>`;
+function toast(m){const d=document.createElement('div');d.textContent=m;$('#toast').append(d);setTimeout(()=>d.remove(),3500)}
+function dlg(html,btns){const d=$('#dlg');d.innerHTML=html+'<div class="row2" style="justify-content:flex-end;margin-top:16px"></div>';
+ btns.forEach(([t,fn,cls])=>{const b=document.createElement('button');b.className='btn '+(cls||'');b.textContent=t;b.onclick=()=>{d.close();fn&&fn()};d.lastChild.append(b)});d.showModal()}
+async function post(url,body){
+ const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+ const d=await r.json().catch(()=>({error:'Unexpected server response'}));
+ if(!r.ok) throw new Error(d.error||('Server returned '+r.status));
+ return d}
+const pct=c=>c==null?null:Math.round(c*100);            // server confidence is 0-1
+const clock=()=>new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+function saveText(name,txt){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+ a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(a.href);toast('Downloaded '+name)}
+async function copyText(t){try{await navigator.clipboard.writeText(t)}catch(e){const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()}toast('Copied')}
+const baseName=n=>(n||'note').replace(/\.[^.]+$/,'').replace(/[^A-Za-z0-9_-]+/g,'_');
+
+/* ===== state ===== */
+const NAV=[['overview','Overview','home'],['new','New Clinical Note','file'],['session','This Session','history'],['settings','Settings','gear']];
+const STEPS=['Upload','Check text','Facts','Review','Approve & report'];
+const SESSION=[];            // in memory only; cleared when the page closes
+let page='overview',health=null,S=fresh(),tab='summary';
+function fresh(){return{step:0,file:null,url:null,lang:'en',text:'',conf:null,draft:null,summary:'',json:'',sourceName:null,
+ privacy:null,approved:null,finalText:'',busy:false,err:'',msg:'',vmsg:null,entry:null}}
+const dirty=()=>S.draft&&!S.approved;
+window.addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue=''}});
+
+function render(){
+ $('#nav').innerHTML=NAV.map(n=>`<button class="nav ${n[0]===page?'on':''}" data-go="${n[0]}" ${n[0]===page?'aria-current="page"':''} title="${n[1]}">${ic(n[2])}<span class="lbl">${n[1]}</span>${n[0]==='session'&&SESSION.length?`<span class="cnt lbl">${SESSION.length}</span>`:''}</button>`).join('');
+ const t=NAV.find(n=>n[0]===page)[1];$('#ttl').textContent=t;$('#crumb').textContent='CliniScribe / '+t;
+ ({overview,new:workspace,session,settings})[page]();window.scrollTo(0,0)}
+function go(p){page=p;$('#app').classList.remove('open');render()}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)go(g.dataset.go)});
+$('#logoIc').innerHTML=ic('file');$('#menu').innerHTML=ic('menu');$('#coll').innerHTML=ic('panel');$('#newBtn').innerHTML=ic('plus')+'<span class="dsk">New Clinical Note</span>';
+$('#newBtn').onclick=()=>{
+ const start=()=>{S=fresh();go('new')};
+ if(dirty())dlg('<h2>Start a new note?</h2><p class="sub">The current draft is not approved and will be lost.</p>',[['Keep working'],['Discard and start new',start,'p']]);else start()};
+$('#menu').onclick=()=>$('#app').classList.toggle('open');
+$('#coll').onclick=()=>$('#app').classList.toggle('col');
+
+/* ===== server status ===== */
+async function loadHealth(){
+ try{const r=await fetch('/health');health=await r.json()}catch(e){health=null}
+ const p=$('#hpill');
+ if(!health){p.textContent='Server not reachable';p.className='pill bad'}
+ else{p.textContent=health.mask_phi?'Privacy masking ON':'Privacy masking OFF';p.className='pill '+(health.mask_phi?'ok':'bad')}
+ if(page==='overview'||page==='settings')render()}
+
+/* ===== overview ===== */
+function overview(){
+ const credOk=health&&health.credentials_found,n=SESSION.length,ap=SESSION.filter(x=>x.status==='Approved').length;
+ $('#view').innerHTML=`<div class="card hero"><div class="row2 between"><div><h1>Handwritten notes to reviewed clinical reports</h1>
+  <div class="sub">Read a handwritten note, mask personal details, draft a structured report, then review and approve it.</div></div>
+  <div class="row2"><button class="btn p" data-go="new">${ic('upload')}Create New Clinical Note</button>${n?`<button class="btn" data-go="session">View this session</button>`:''}</div></div></div>
+ <div class="grid g4">
+  <div class="card stat"><span class="sub">Privacy masking</span><b style="color:${!health?'var(--mut)':health.mask_phi?'var(--grn)':'var(--red)'}">${!health?'Unknown':health.mask_phi?'ON':'OFF'}</b></div>
+  <div class="card stat"><span class="sub">Vision credentials</span><b style="color:${credOk?'var(--grn)':'var(--red)'}">${!health?'Unknown':credOk?'Found':'Missing'}</b></div>
+  <div class="card stat"><span class="sub">Notes this session</span><b>${n}</b></div>
+  <div class="card stat"><span class="sub">Approved this session</span><b>${ap}</b></div></div>
+ ${!health?'<div class="err">Cannot reach the server. Is <span class="mono">python app.py</span> running?</div>':''}
+ ${health&&!credOk?'<div class="warn">'+ic('warn')+'<div>Vision key not found. Put it at <span class="mono">credentials/vision-key.json</span> or set GOOGLE_APPLICATION_CREDENTIALS in .env, then restart.</div></div>':''}
+ <h3>How it works</h3>
+ <div class="grid g4">
+  <div class="card"><h2>1. Read</h2><p class="sub">The photo is read by Google Cloud Vision and put back in reading order.</p></div>
+  <div class="card"><h2>2. Mask</h2><p class="sub">Names, addresses, phone numbers, IDs and dates are masked before anything is shown or summarised.</p></div>
+  <div class="card"><h2>3. Review</h2><p class="sub">Check each fact against the image. Every fact shows the line it came from.</p></div>
+  <div class="card"><h2>4. Approve</h2><p class="sub">Approve, then copy, print or download a readable report. Nothing is stored.</p></div></div>
+ <div class="note" style="margin-top:16px">${ic('info')}The image itself is sent to Google Cloud Vision before masking. Masking is rule-based, so read the masked text in full before sharing a report.</div>`}
+
+/* ===== this session ===== */
+function session(){
+ $('#view').innerHTML=`<div class="note">${ic('info')}Only notes processed since you opened this page. This list lives in the browser's memory and disappears when you close or reload the page.</div>
+ <div class="card">${SESSION.length?`<div class="tw"><table><thead><tr><th>#</th><th>Source</th><th>Time</th><th>OCR confidence</th><th>Status</th><th></th></tr></thead><tbody>
+ ${SESSION.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name||'(masked)')}</td><td>${x.time}</td><td>${x.conf==null?'-':x.conf+'%'}</td>
+ <td><span class="pill ${x.status==='Approved'?'ok':''}">${x.status}</span></td><td><button class="btn" data-view="${i}">View report</button></td></tr>`).join('')}</tbody></table></div>`
+ :`<div style="text-align:center;padding:36px" class="sub"><p>No notes yet this session.</p><button class="btn p" data-go="new">Create a clinical note</button></div>`}</div>`;
+ document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{const x=SESSION[+b.dataset.view];
+  const t=x.finalText||'No report text built yet for this note. Open it from New Clinical Note before closing the page next time.';
+  dlg(`<h2>${esc(x.name||'Report')} <span class="pill ${x.status==='Approved'?'ok':''}">${x.status}</span></h2><textarea class="mono" rows="18" readonly style="margin-top:12px">${esc(t)}</textarea>`,
+  [['Copy',()=>copyText(t)],['Download',()=>saveText('clinical_report_'+baseName(x.name)+'.txt',t)],['Close',null,'p']])})}
+
+function settings(){
+ $('#view').innerHTML=`<div class="card"><h2>Settings</h2>
+ <p class="sub">Settings live on the server in the <span class="mono">.env</span> file next to <span class="mono">app.py</span>. Restart the server after changing them.</p>
+ <pre class="mono">${esc(JSON.stringify(health||{error:'server not reachable'},null,2))}</pre>
+ <ul class="sub"><li><span class="mono">MASK_PHI=0</span> turns privacy masking off (not recommended).</li>
+ <li><span class="mono">MASK_DATES=0</span> keeps ordinary dates (dates of birth are still masked).</li>
+ <li><span class="mono">GOOGLE_APPLICATION_CREDENTIALS</span> sets the path to the Vision key file.</li></ul>
+ <button class="btn" id="rechk">${ic('refresh')}Re-check server</button></div>`;
+ $('#rechk').onclick=loadHealth}
+
+/* ===== workspace pieces ===== */
+function stepper(){return`<div class="stepper">${STEPS.map((s,i)=>`<div class="stp ${i===S.step?'on':i<S.step?'done':''}" ${i===S.step?'aria-current="step"':''}>${i<S.step?ic('check'):`<span class="n">${i+1}</span>`}${s}</div>`).join('')}</div>`}
+
+function privacyHtml(){
+ const p=(S.draft&&S.draft.privacy)||S.privacy;if(!p)return'';
+ const kinds=Object.entries(p.counts||{}).map(([k,v])=>k+' x'+v).join(', ');
+ let h=`<div class="priv ${p.masked?'':'off'}">${ic('shield')}<div>${p.masked
+  ?'<b>Personal details masked.</b> '+(kinds?'Masked: '+esc(kinds)+'.':'Nothing needed masking.')
+  :'<b>Privacy masking is OFF.</b> Personal details may be visible.'}</div></div>`;
+ (p.uncertain||[]).forEach(t=>{h+=`<div class="warn">${ic('warn')}<div>${esc(t)}</div></div>`});
+ return h}
+
+const GROUPS=[['patient_details','Patient details'],['medications','Medications'],['symptoms_and_findings','Symptoms and findings'],
+ ['negations','Negations'],['other_measurements','Other measurements'],['other_facts','Other']];
+function factCard(f,k){
+ const v=Array.isArray(f.value)?f.value.join(', '):f.value;
+ let chips='';
+ if(f.type==='medication')chips+=`<span class="chip">dose: ${esc(f.dose||'not found')}</span><span class="chip act">${esc(f.action||'')}</span>`;
+ if(f.negated&&f.type!=='negation')chips+='<span class="chip neg">NEGATED</span>';
+ const title=f.type==='medication'?esc(v):esc(String(f.type||'').replace(/_/g,' '))+': '+esc(v);
+ return`<div class="fact k-${k}"><div class="t">${title}</div><div>${chips}</div><div class="src">from: ${esc(f.source_text)}</div></div>`}
+function factsHtml(){
+ const cr=(S.draft&&S.draft.clinical_report)||{};let h='',chips='';
+ GROUPS.forEach(([k,t])=>{const items=cr[k]||[];if(!items.length)return;
+  chips+=`<span class="chip">${t}: ${items.length}</span>`;
+  h+=`<h3>${t}</h3><div class="grid g2e">${items.map(f=>factCard(f,k)).join('')}</div>`});
+ return h?`<div>${chips}</div>`+h:'<p class="sub">No structured facts were recognized. Check the text on the previous step.</p>'}
+function flagsHtml(){return((S.draft&&S.draft.review_flags)||[]).map(t=>`<div class="warn">${ic('warn')}<div>${esc(t)}</div></div>`).join('')}
+const flagCount=()=>((S.draft&&S.draft.review_flags)||[]).length;
+
+/* ===== workspace ===== */
+function workspace(){
+ let h=`<div class="note">${ic('info')}AI-assisted documentation. Verify all clinical facts against the original image before approval.</div>`+stepper();
+ if(S.err)h+=`<div class="err" role="alert">${esc(S.err)}</div>`;
+ if(S.msg)h+=`<div class="warn">${ic('warn')}<div>${esc(S.msg)}</div></div>`;
+ const c=pct(S.conf),col=c==null?'#94a3b8':c>=85?'var(--grn)':c>=70?'var(--amb)':'var(--red)';
+
+ if(S.step===0){
+  h+=`<div class="card"><div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload handwritten note">${ic('upload')}<h2 style="margin-top:8px">Drop a handwritten note here</h2><p class="sub">PNG, JPG, BMP, TIFF, GIF or WEBP, up to 10 MB, or <u>browse files</u></p></div>
+  <input id="file" type="file" accept="image/*" hidden>
+  ${S.file?`<div class="row2" style="margin-top:16px;align-items:flex-start"><img class="thumb" id="pv" src="${S.url}" alt="Selected note preview" style="width:150px">
+   <div><b>${esc(S.file.name)}</b><div class="sub">${(S.file.size/1024).toFixed(0)} KB</div>
+   <div class="row2" style="margin-top:10px"><label class="sub" for="lang">Language</label><select id="lang"><option value="en">English</option><option value="en,ta">English + Tamil</option><option value="en,hi">English + Hindi</option><option value="">Auto-detect</option></select></div>
+   <div class="row2" style="margin-top:10px"><button class="btn p" id="run" ${S.busy?'disabled':''}>${S.busy?'<span class="spin"></span>Reading and masking...':'Run OCR'}</button><button class="btn" id="rm" ${S.busy?'disabled':''}>Remove</button></div>
+   ${S.busy?'<p class="sub">Reading the handwriting, masking personal details and drafting. This can take a few seconds.</p>':''}</div></div>
+   <p class="sub" style="margin-top:12px">The image is sent to Google Cloud Vision to be read. Masking applies to everything after that step.</p>`:''}</div>`}
+
+ else if(S.step===1){
+  h+=`<div class="grid g12"><div class="card"><div class="row2" style="gap:16px"><div class="ring" style="--v:${c||0};--c:${col}"><div>${c==null?'n/a':c+'%'}</div></div>
+  <div><h2>OCR confidence</h2><p class="sub" style="margin:4px 0 0">${c!=null&&c<85?'Below 85%. Check drug names and doses against the image.':'Compare the text with the image.'}</p></div></div>
+  ${S.url?`<h3>Original image <span style="text-transform:none;letter-spacing:0">(click to enlarge)</span></h3><img class="thumb" id="pv" src="${S.url}" alt="Original note">`:''}</div>
+  <div class="card">${privacyHtml()}<h2>Text from the image <span class="sub">(masked, editable)</span></h2>
+  <textarea id="txt" rows="14" aria-label="Extracted text" style="margin-top:8px">${esc(S.text)}</textarea>
+  <div class="row2" style="margin-top:12px"><button class="btn" id="regen" ${S.busy?'disabled':''}>${S.busy?'<span class="spin"></span>Working...':ic('refresh')+'Re-generate draft from this text'}</button>
+  <button class="btn p" id="toFacts" ${S.draft?'':'disabled'}>Continue to facts</button><button class="btn" id="back">Back</button></div>
+  ${S.draft?'':'<p class="sub">No draft yet. Click "Re-generate draft" to build one.</p>'}</div></div>`}
+
+ else if(S.step===2){
+  h+=`<div class="card">${privacyHtml()}<div class="row2 between"><h2>Extracted clinical facts</h2><div class="row2"><button class="btn" id="back">Back to text</button><button class="btn p" id="toReview">Continue to review</button></div></div>
+  ${flagCount()?`<h3>${flagCount()} flag(s) to check</h3>`+flagsHtml():''}${factsHtml()}</div>`}
+
+ else if(S.step===3){
+  h+=`<div class="card"><div class="row2 between"><h2>Review the report</h2><span class="pill">DRAFT - NOT APPROVED</span></div>
+  <div class="tabs" role="tablist"><button class="tab ${tab==='summary'?'on':''}" data-tab="summary" role="tab">Summary</button><button class="tab ${tab==='json'?'on':''}" data-tab="json" role="tab">Structured JSON</button></div>
+  ${tab==='summary'?`<textarea id="sum" rows="7" aria-label="Summary">${esc(S.summary)}</textarea>${flagCount()?`<h3>${flagCount()} flag(s) to check</h3>`+flagsHtml():'<p class="sub">No review flags.</p>'}`
+  :`<textarea id="js" class="mono" rows="16" aria-label="Structured JSON">${esc(S.json)}</textarea><div id="vmsg">${S.vmsg||''}</div>
+   <div class="row2" style="margin-top:10px"><button class="btn" id="val">Validate</button><button class="btn" id="resetjs">Reset JSON to draft</button></div>`}
+  <div class="row2" style="margin-top:16px"><button class="btn" id="back">Back to facts</button><button class="btn" id="val2">Validate</button><button class="btn p" id="toFinal">Continue to approval</button></div>
+  ${tab==='summary'&&S.vmsg?`<div>${S.vmsg}</div>`:''}</div>`}
+
+ else{
+  h+=`<div class="grid g2"><div class="card"><div class="row2 between"><h2>Final report</h2>${S.approved?'<span class="pill ok">APPROVED IN THIS SESSION</span>':'<span class="pill">DRAFT - NOT APPROVED</span>'}</div>
+  <textarea id="final" rows="24" class="mono" readonly aria-label="Final report" style="margin-top:10px">${esc(S.finalText)}</textarea>
+  <div class="row2" style="margin-top:10px"><button class="btn" id="copyR">${ic('copy')}Copy</button><button class="btn" id="dlR">${ic('download')}Download .txt</button><button class="btn" id="prR">${ic('print')}Print</button><button class="btn" id="refresh">${ic('refresh')}Refresh</button></div></div>
+  <div class="grid" style="align-content:start"><div class="card"><h2>Approval</h2>
+  ${S.approved?`<div class="okb">Approved by <b>${esc(S.approved.by)}</b>. ${esc(S.approved.notice||'')}</div><p class="sub">Copy, print or download the report now. This app does not save it.</p><button class="btn p" id="another">Start another note</button>`:
+  `<p class="sub">Confirm you checked every fact against the original image.</p>${flagCount()?`<div class="warn">${ic('warn')}<div>${flagCount()} review flag(s) are still listed on the previous step.</div></div>`:''}
+  <label for="rv" class="sub">Reviewer name or initials</label><input type="text" id="rv" style="margin:6px 0 10px"><button class="btn g" id="appr">${ic('shield')}Approve report</button><div id="amsg"></div>`}
+  <button class="btn" id="back" style="margin-top:10px">Back to review</button></div></div></div>`}
+ $('#view').innerHTML=h;wire()}
+
+/* ===== actions ===== */
+function currentReport(){
+ let r;
+ try{r=JSON.parse(S.json)}
+ catch(e){ if(!S.draft)throw e; r=JSON.parse(JSON.stringify(S.draft)); S.json=JSON.stringify(r,null,2);
+  S.msg='The JSON box had an error ('+e.message+'), so it was reset to the last generated draft. Your summary edits were kept.'}
+ r.summary=S.summary;return r}
+function loadDraft(d){S.draft=d;S.summary=d.summary||'';S.json=JSON.stringify(d,null,2);S.approved=null;S.finalText='';S.vmsg=null;
+ if(S.entry){S.entry.status='Draft';S.entry.finalText=''}}
+
+function wire(){
+ const on=(id,fn)=>{const e=$(id);if(e)e.onclick=fn};
+ const drop=$('#drop'),fi=$('#file');
+ if(drop){drop.onclick=()=>fi.click();drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fi.click()}};
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};drop.ondragleave=()=>drop.classList.remove('over');
+  drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');pick(e.dataTransfer.files[0])};fi.onchange=()=>pick(fi.files[0])}
+ if($('#lang')){$('#lang').value=S.lang;$('#lang').onchange=e=>S.lang=e.target.value}
+ on('#pv',()=>dlg(`<img src="${S.url}" alt="Original note, enlarged" style="width:100%;border-radius:8px">`,[['Close',null,'p']]));
+ on('#rm',()=>{S=fresh();workspace()});
+ on('#run',runOcr);on('#regen',regen);
+ on('#back',()=>{S.err='';S.msg='';S.step=Math.max(0,S.step-1);workspace()});
+ on('#toFacts',()=>{S.step=2;workspace()});on('#toReview',()=>{S.step=3;workspace()});
+ on('#toFinal',async()=>{S.step=4;S.msg='';await buildFinal()});
+ on('#val',validate);on('#val2',validate);
+ on('#resetjs',()=>{if(S.draft){S.json=JSON.stringify(S.draft,null,2);S.vmsg=null;S.msg='';workspace()}});
+ document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;workspace()});
+ on('#refresh',buildFinal);
+ on('#copyR',()=>copyText(S.finalText));
+ on('#dlR',()=>saveText('clinical_report_'+baseName(S.sourceName)+'.txt',S.finalText));
+ on('#prR',()=>{$('#printOnly').textContent=S.finalText;window.print()});
+ on('#appr',askApprove);
+ on('#another',()=>{S=fresh();workspace()});
+ if($('#txt'))$('#txt').oninput=e=>S.text=e.target.value;
+ if($('#sum'))$('#sum').oninput=e=>S.summary=e.target.value;
+ if($('#js'))$('#js').oninput=e=>S.json=e.target.value}
+
+function pick(f){if(!f)return;
+ if(!/^image\//.test(f.type)){S.err='Unsupported file. Choose an image (PNG, JPG, BMP, TIFF, GIF or WEBP).';return workspace()}
+ if(f.size>10*1024*1024){S.err='That file is over the 10 MB limit.';return workspace()}
+ S.err='';S.file=f;S.url=URL.createObjectURL(f);workspace()}
+
+async function runOcr(){
+ S.busy=true;S.err='';S.msg='';workspace();
+ try{
+  const fd=new FormData();fd.append('image',S.file);fd.append('lang',S.lang);
+  const r=await fetch('/extract-text',{method:'POST',body:fd});
+  const d=await r.json().catch(()=>({error:'Unexpected server response'}));
+  if(!r.ok)throw new Error(d.error||'Request failed');
+  S.conf=d.confidence;S.privacy=d.privacy||null;
+  S.text=d.ordered_text||d.text||'';
+  if(!S.text.trim()){S.err='No text was detected in this image. Try a clearer photo.';S.busy=false;return workspace()}
+  S.sourceName=d.clinical_draft&&d.clinical_draft.source?d.clinical_draft.source.name:null;   // masked name from the server
+  S.entry={name:S.sourceName,time:clock(),conf:pct(d.confidence),status:'Draft',finalText:''};SESSION.push(S.entry);
+  if(d.clinical_draft)loadDraft(d.clinical_draft);
+  else{S.draft=null;S.msg='Text was read, but no draft was built'+(d.clinical_draft_error?' ('+d.clinical_draft_error+')':'')+'. You can edit the text and re-generate.'}
+  S.step=1;tab='summary'}
+ catch(e){S.err='OCR failed: '+e.message}
+ S.busy=false;workspace();render_nav()}
+function render_nav(){const on=page;$('#nav').innerHTML=NAV.map(n=>`<button class="nav ${n[0]===on?'on':''}" data-go="${n[0]}" title="${n[1]}">${ic(n[2])}<span class="lbl">${n[1]}</span>${n[0]==='session'&&SESSION.length?`<span class="cnt lbl">${SESSION.length}</span>`:''}</button>`).join('')}
+
+async function regen(){
+ S.busy=true;S.err='';workspace();
+ try{
+  const d=await post('/api/summarize',{ocr_text:S.text,ocr_confidence:S.conf,source_name:S.sourceName});
+  if(d.source&&typeof d.source.text==='string')S.text=d.source.text;   // show the masked text
+  S.msg='';loadDraft(d);toast('Draft re-generated')}
+ catch(e){S.err='Could not generate: '+e.message}
+ S.busy=false;workspace()}
+
+async function validate(){
+ try{
+  const r=await post('/api/validate',currentReport());
+  S.vmsg=r.valid?'<div class="okb">Structure looks valid. Clinical accuracy still needs manual review.</div>'
+   :(r.issues||[]).map(i=>`<div class="warn">${ic('warn')}<div>${esc(i)}</div></div>`).join('');
+ }catch(e){S.vmsg=`<div class="err">Validation failed: ${esc(e.message)}</div>`}
+ workspace()}
+
+async function buildFinal(){
+ try{const r=await post('/api/report-text',currentReport());S.finalText=r.text;S.err='';if(S.entry)S.entry.finalText=r.text}
+ catch(e){S.err='Could not build the report: '+e.message}
+ workspace()}
+
+function askApprove(){
+ const by=$('#rv').value.trim(),m=$('#amsg');
+ if(!by){m.innerHTML='<div class="warn">Enter reviewer name or initials before approval.</div>';$('#rv').focus();return}
+ dlg(`<h2>Approve this report?</h2><p class="sub">You confirm the facts match the original note. Reviewer: <b>${esc(by)}</b>.</p>`,
+  [['Cancel'],['Approve',()=>doApprove(by),'g']])}
+async function doApprove(by){
+ const m=$('#amsg');
+ try{
+  const report=currentReport();
+  const v=await post('/api/validate',report);
+  if(!v.valid){m.innerHTML=v.issues.map(i=>`<div class="warn">${esc(i)}</div>`).join('');return}
+  const r=await post('/api/approve',{report,approved_by:by});   // the edited report is what gets approved
+  S.json=JSON.stringify(r.report,null,2);S.summary=r.report.summary||S.summary;
+  S.approved={by,notice:r.report.approval_notice};if(S.entry)S.entry.status='Approved';
+  toast('Report approved');await buildFinal();render_nav()}
+ catch(e){m.innerHTML=`<div class="err">Could not approve: ${esc(e.message)}</div>`}}
+
+render();loadHealth();
+</script></body></html>

@@ -1,0 +1,21 @@
+# secrets - never commit these
+.env
+credentials/
+*.json
+!package.json
+
+# patient / upload data
+uploads/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

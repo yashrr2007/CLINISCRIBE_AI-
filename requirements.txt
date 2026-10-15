@@ -1,0 +1,4 @@
+flask
+google-cloud-vision
+python-dotenv
+pytest
